@@ -31,6 +31,7 @@ import EventCapture from "./EventCapture";
 
 import CanvasContainer from "./CanvasContainer";
 import evaluator from "./scale/evaluator";
+import * as dispatch from "d3-dispatch";
 
 const log = getLogger("ChartCanvas");
 
@@ -549,6 +550,11 @@ class ChartCanvas extends Component {
 		this.triggerEvent("dragcancel");
 	}
 	handlePinchZoom(initialPinch, finalPinch, e) {
+
+        if(e && e.path){
+            dispatch.call("handlePinchZoom", this, {initialPinch, finalPinch, e});
+        }
+
 		if (!this.waitingForPinchZoomAnimationFrame) {
 			this.waitingForPinchZoomAnimationFrame = true;
 			const state = this.pinchZoomHelper(initialPinch, finalPinch);
@@ -566,6 +572,10 @@ class ChartCanvas extends Component {
 	}
 	handlePinchZoomEnd(initialPinch, e) {
 		const { xAccessor } = this.state;
+
+        if(e && e.path){
+            dispatch.call("handlePinchZoomEnd", this, {initialPinch, e});
+        }
 
 		if (this.finalPinch) {
 			const state = this.pinchZoomHelper(initialPinch, this.finalPinch);
@@ -591,6 +601,10 @@ class ChartCanvas extends Component {
 		}
 	}
 	handleZoom(zoomDirection, mouseXY, e) {
+        if(!e.triggered){
+            dispatch.call("handleZoom", this, {zoomDirection, mouseXY, e});
+        }
+
 		if (this.panInProgress)
 			return;
 		// console.log("zoomDirection ", zoomDirection, " mouseXY ", mouseXY);
@@ -759,6 +773,11 @@ class ChartCanvas extends Component {
 		};
 	}
 	handlePan(mousePosition, panStartXScale, dxdy, chartsToPan, e) {
+
+        if(!e.triggered){
+            dispatch.call("handlePan", this, {mousePosition, panStartXScale, dxdy, chartsToPan, e});
+        }
+
 		if (!this.waitingForPanAnimationFrame) {
 			this.waitingForPanAnimationFrame = true;
 
@@ -788,6 +807,11 @@ class ChartCanvas extends Component {
 		}
 	}
 	handlePanEnd(mousePosition, panStartXScale, dxdy, chartsToPan, e) {
+
+        if(!(e && e.triggered)){
+            dispatch.call("handlePanEnd", this, {mousePosition, panStartXScale, dxdy, chartsToPan, e});
+        }
+
 		const state = this.panHelper(mousePosition, panStartXScale, dxdy, chartsToPan);
 		// console.log(this.canvasDrawCallbackList.map(d => d.type));
 		this.hackyWayToStopPanBeyondBounds__plotData = null;
@@ -827,14 +851,29 @@ class ChartCanvas extends Component {
 		});
 	}
 	handleMouseDown(mousePosition, currentCharts, e) {
+
+        if(e && e.path){
+            dispatch.call("handleMouseDown", this, {mousePosition, currentCharts, e});
+        }
+
 		this.triggerEvent("mousedown", this.mutableState, e);
 	}
 	handleMouseEnter(e) {
+
+        if(e && e.path){
+            dispatch.call("handleMouseEnter", this, {e});
+        }
+
 		this.triggerEvent("mouseenter", {
 			show: true,
 		}, e);
 	}
 	handleMouseMove(mouseXY, inputType, e) {
+
+        if(e && e.path){
+            dispatch.call("handleMouseMove", this, {mouseXY, inputType, e});
+        }
+
 		if (!this.waitingForMouseMoveAnimationFrame) {
 			this.waitingForMouseMoveAnimationFrame = true;
 
@@ -865,14 +904,29 @@ class ChartCanvas extends Component {
 		}
 	}
 	handleMouseLeave(e) {
+
+        if(!e){
+            dispatch.call("handleMouseLeave", this, {e});
+        }
+
 		this.triggerEvent("mouseleave", { show: false }, e);
 		this.clearMouseCanvas();
 		this.draw({ trigger: "mouseleave" });
 	}
 	handleDragStart({ startPos }, e) {
+
+        if(e && e.path){
+            dispatch.call("handleDragStart", this, {_ref3, e});
+        }
+
 		this.triggerEvent("dragstart", { startPos }, e);
 	}
 	handleDrag({ startPos, mouseXY }, e) {
+
+        if(e && e.path){
+            dispatch.call("handleDrag", this, { startPos, mouseXY }, e);
+        }
+
 		const { chartConfig, plotData, xScale, xAccessor } = this.state;
 		const currentCharts = getCurrentCharts(chartConfig, mouseXY);
 		const currentItem = getCurrentItem(xScale, xAccessor, mouseXY, plotData);
@@ -897,6 +951,10 @@ class ChartCanvas extends Component {
 	}
 	handleDragEnd({ mouseXY }, e) {
 		this.triggerEvent("dragend", { mouseXY }, e);
+
+        if(e && e.path){
+            dispatch.call("handleDragEnd", this, {mouseXY}, e);
+        }
 
 		requestAnimationFrame(() => {
 			this.clearMouseCanvas();
@@ -1079,6 +1137,7 @@ class ChartCanvas extends Component {
 					</defs>
 					<g transform={`translate(${margin.left + 0.5}, ${margin.top + 0.5})`}>
 						<EventCapture
+                            id={"e" + this.props.id}
 							ref={this.saveEventCaptureNode}
 							useCrossHairStyleCursor={cursorStyle}
 							mouseMove={mouseMoveEvent && interaction}
@@ -1129,6 +1188,7 @@ function isInteractionEnabled(xScale, xAccessor, data) {
 }
 
 ChartCanvas.propTypes = {
+    id:PropTypes.oneOfType([PropTypes.number, PropTypes.string]).isRequired,
 	width: PropTypes.number.isRequired,
 	height: PropTypes.number.isRequired,
 	margin: PropTypes.object,
