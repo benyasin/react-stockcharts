@@ -28,7 +28,6 @@ import EventCapture from "./EventCapture";
 
 import CanvasContainer from "./CanvasContainer";
 import evaluator from "./scale/evaluator";
-import * as dispatch from "d3-dispatch";
 
 var log = getLogger("ChartCanvas");
 
@@ -633,7 +632,7 @@ var ChartCanvas = function (_Component) {
 	}, {
 		key: "handleZoom",
 		value: function handleZoom(zoomDirection, mouseXY, e) {
-			if (!e.triggered) {
+			if (e.type === 'wheel' && !e.triggered) {
 				dispatch.call("handleZoom", this, { zoomDirection: zoomDirection, mouseXY: mouseXY, e: e });
 			}
 
@@ -834,7 +833,7 @@ var ChartCanvas = function (_Component) {
 		value: function handlePan(mousePosition, panStartXScale, dxdy, chartsToPan, e) {
 			var _this4 = this;
 
-			if (!e.triggered) {
+			if (e.type !== 'keydown' && !e.triggered) {
 				dispatch.call("handlePan", this, { mousePosition: mousePosition, panStartXScale: panStartXScale, dxdy: dxdy, chartsToPan: chartsToPan, e: e });
 			}
 

@@ -42,12 +42,6 @@ var _evaluator2 = require("./scale/evaluator");
 
 var _evaluator3 = _interopRequireDefault(_evaluator2);
 
-var _d3Dispatch = require("d3-dispatch");
-
-var dispatch = _interopRequireWildcard(_d3Dispatch);
-
-function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
-
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _objectWithoutProperties(obj, keys) { var target = {}; for (var i in obj) { if (keys.indexOf(i) >= 0) continue; if (!Object.prototype.hasOwnProperty.call(obj, i)) continue; target[i] = obj[i]; } return target; }
@@ -661,7 +655,7 @@ var ChartCanvas = function (_Component) {
 	}, {
 		key: "handleZoom",
 		value: function handleZoom(zoomDirection, mouseXY, e) {
-			if (!e.triggered) {
+			if (e.type === 'wheel' && !e.triggered) {
 				dispatch.call("handleZoom", this, { zoomDirection: zoomDirection, mouseXY: mouseXY, e: e });
 			}
 
@@ -862,7 +856,7 @@ var ChartCanvas = function (_Component) {
 		value: function handlePan(mousePosition, panStartXScale, dxdy, chartsToPan, e) {
 			var _this4 = this;
 
-			if (!e.triggered) {
+			if (e.type !== 'keydown' && !e.triggered) {
 				dispatch.call("handlePan", this, { mousePosition: mousePosition, panStartXScale: panStartXScale, dxdy: dxdy, chartsToPan: chartsToPan, e: e });
 			}
 
