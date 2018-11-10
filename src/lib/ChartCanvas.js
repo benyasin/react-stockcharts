@@ -600,7 +600,7 @@ class ChartCanvas extends Component {
 		}
 	}
 	handleZoom(zoomDirection, mouseXY, e) {
-        if(!e.triggered){
+        if(e.type === 'wheel' && !e.triggered){
             dispatch.call("handleZoom", this, {zoomDirection, mouseXY, e});
         }
 
@@ -773,7 +773,7 @@ class ChartCanvas extends Component {
 	}
 	handlePan(mousePosition, panStartXScale, dxdy, chartsToPan, e) {
 
-        if(!e.triggered){
+        if(e.type !== 'keydown' && !e.triggered){
             dispatch.call("handlePan", this, {mousePosition, panStartXScale, dxdy, chartsToPan, e});
         }
 
