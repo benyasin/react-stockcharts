@@ -31,7 +31,6 @@ import EventCapture from "./EventCapture";
 
 import CanvasContainer from "./CanvasContainer";
 import evaluator from "./scale/evaluator";
-import * as dispatch from "d3-dispatch";
 
 const log = getLogger("ChartCanvas");
 
